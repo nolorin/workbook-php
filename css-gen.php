@@ -3,13 +3,13 @@
 class style {
 	protected array $attr = array();
 	protected string $type = '';
-	protected string $name;
+	public string $name;
 	public bool $verbose = FALSE;
-	public __construct( string $name, string $type = 'class' ) {
+	public function __construct( string $name, string $type = 'class' ) {
 		$this->name = $name;
 		$this->type( $type );
 	}
-	public __toString(): string {
+	public function __toString(): string {
 		$eol = $this->verbose ? PHP_EOL : '';
 		$ind = $this->verbose ? "\t" : '';
 		$spa = $this->verbose ? ' ' : '';
@@ -19,22 +19,6 @@ class style {
 		}
 		$output .= '}' . $eol;
 		return $output;
-	}
-	public function __set( string $prop, $value ) {
-		if( in_array( $value, [ 'name', 'type' ] ) ) {
-			$this->$prop = $value;
-			return TRUE;
-		} else {
-			return parent::__set( $prop, $value );
-		}
-	}
-	public function unset( string $attr ) {
-		if( in_array( $attr, [ 'name', 'type' ] ) ) {
-			$this->$attr = '';
-			return TRUE;
-		} else {
-			return parent::__unset( $attr );
-		}
 	}
 	public function set( string $attr, $value ) {
 		if( is_string( $value ) || is_numeric( $value ) ) {
@@ -51,7 +35,7 @@ class style {
 		unset( $this->attr[$attr] );
 		return TRUE;
 	}
-	pubilic function type( string $type ) {
+	public function type( string $type ) {
 		switch( $type ) {
 			case 'class':
 				$this->type = '.'; break;
@@ -63,3 +47,18 @@ class style {
 		return TRUE;
 	}
 }
+
+// Test
+$style = new style( 'block', 'class' );
+$style->set( 'color', 'red' );
+$style->set( 'padding', '2px 2.5px' );
+echo $style . PHP_EOL . PHP_EOL;
+$style->clear( 'padding' );
+$style->set( 'margin', '2px' );
+$style->verbose = TRUE;
+echo $style . PHP_EOL;
+$style->set( 'border-radius', '10px' );
+$style->type( 'id' );
+$style->verbose = FALSE;
+echo $style . PHP_EOL;
+
