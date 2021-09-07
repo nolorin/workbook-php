@@ -52,16 +52,48 @@ class html {
 		unset( $this->attr[$name] );
 		return TRUE;
 	}
-	public function append( string $name, $child ): bool {
+	public function append( $child, string $name = NULL ): bool {
+		$key = $name ?? count( $this->inner_html );
 		if( $child instanceof html || is_string( $child ) ) {
-			$this->inner_html[$name] = $child;
+			$this->inner_html[$key] = $child;
 			return TRUE;
 		} else {
 			return FALSE;
 		}
 	}
-	public function drop( string $name ) {
-		unset( $this->inner_html[$name] );
+	public function drop( string $key ) {
+		unset( $this->inner_html[$key] );
 		return TRUE;
 	}
 }
+
+// Test
+$html = new html( 'div' );
+$html->attr( 'id', 'node-1' );
+$html->attr( 'style', 'color:black' );
+echo $html . PHP_EOL . PHP_EOL;
+$html->short_tag = TRUE;
+echo $html . PHP_EOL . PHP_EOL;
+$html->short_tag = $html->close_tag = FALSE;
+echo $html . PHP_EOL . PHP_EOL;
+
+$child = new html( 'span' );
+$child->attr( 'info', 'true' );
+$html->append( $child, 'select' );
+echo $html . PHP_EOL . PHP_EOL; // Doesn't print child because there is no closing tag
+$html->close_tag = TRUE;
+echo $html . PHP_EOL . PHP_EOL;
+$html->verbose = FALSE;
+echo $html . PHP_EOL . PHP_EOL;
+$html->verbose = TRUE;
+$html->clear( 'style' );
+$html->append( 'Here is a text inner.' );
+$html->drop( 'select' );
+echo $html . PHP_EOL . PHP_EOL;
+
+ob_start();
+var_dump( $html );
+$var_dump = ob_get_clean();
+echo preg_replace( '/[\n\t\s+]/', '', $var_dump ) . PHP_EOL;
+
+exit;
