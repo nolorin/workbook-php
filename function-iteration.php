@@ -1,5 +1,5 @@
 <?php
-// Recursively iterating lambda functions
+// Recursive function iteration
 
 // Checks if variable is contained within array, including any arrays with scopes within that array's scope (i.e., sub-arrays, sub-sub-arrays, sub-sub-sub-arrays, etc.).
 $array_check = function( $needle, array $haystack ) use( &$array_check ): bool {
@@ -16,29 +16,20 @@ $array_check = function( $needle, array $haystack ) use( &$array_check ): bool {
 };
 
 // Checks whether a lambda function results in a constant value after being applied to itself over and over.
-$n_to_infinity = function( $input, callable $func, int $num_iterations, int $depth = 1 ): bool {
-	$i = 0;
-	$d = 0;
-	$iteration = function( callable $f, $prev ) use( &$iteration, &$i, &$d, $num_iterations, $depth ) {
-		if( $i<$num_iterations ) {
-			$result = $f( $prev );
-			if( $result == $prev ) {
-				$d++;
-				if( $d >= $depth ) {
-					return TRUE;
-				}
-			}
-			$i++;
-			return $iteration( $f, $result );
-		} else {
-			return NULL;
+$n_to_infinity = function( $initial, callable $func, int $num_iterations, int $depth = 1 ): bool {
+	$prev = $initial;
+	for( $i=0, $d=0; $i<$num_iterations; $i++ ) {
+		$result = $func( $prev );
+		if( $result == $prev ) {
+			$d++;
 		}
-	};
-	if( $iteration( $func, $input ) ) {
-		return TRUE;
-	} else {
-		return FALSE;
+		if( $d >= $depth ) {
+			return TRUE;
+		} else {
+			$prev = $result;
+		}
 	}
+	return FALSE;
 };
 
 // Apply a lambda function over and over to a variable for a set number of times and until a specific result is achieved, whichever comes first
